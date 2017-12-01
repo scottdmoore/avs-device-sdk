@@ -16,6 +16,7 @@
  */
 
 #include "Alerts/AlertScheduler.h"
+#include "Alerts/UdpClientServer.h"
 
 #include <AVSCommon/Utils/Logger/Logger.h>
 #include <AVSCommon/Utils/Timing/TimeUtils.h>
@@ -164,6 +165,9 @@ bool AlertScheduler::deleteAlert(const std::string& alertToken) {
 
     if (m_activeAlert && m_activeAlert->getToken() == alertToken) {
         deactivateActiveAlertHelperLocked(Alert::StopReason::AVS_STOP);
+    	std::string temp = "stop:";
+    	const char *array = temp.c_str();
+    	m_udp_client->send(array, temp.size());
         return true;
     }
 
@@ -408,6 +412,9 @@ void AlertScheduler::setTimerForNextAlertLocked() {
 
     if (m_scheduledAlerts.empty()) {
         ACSDK_INFO(LX("executeScheduleNextAlertForRendering").m("no work to do."));
+    	std::string temp = "stop:";
+    	const char *array = temp.c_str();
+    	m_udp_client->send(array, temp.size());
         return;
     }
 
@@ -420,6 +427,14 @@ void AlertScheduler::setTimerForNextAlertLocked() {
     }
 
     std::chrono::seconds secondsToWait{alert->getScheduledTime_Unix() - timeNow};
+    
+    std::string temp = "stop:";
+    const char *array = temp.c_str();
+    m_udp_client->send(array, temp.size());
+
+    temp = "start:" +std::to_string(secondsToWait.count());
+    array = temp.c_str();
+    m_udp_client->send(array, temp.size());
 
     if (secondsToWait < std::chrono::seconds::zero()) {
         secondsToWait = std::chrono::seconds::zero();

@@ -7,6 +7,7 @@ add_library(Alerts SHARED
         Alert.cpp
         AlertsCapabilityAgent.cpp
         AlertScheduler.cpp
+	UdpClientServer.cpp
         Reminder.cpp
         Timer.cpp)
 

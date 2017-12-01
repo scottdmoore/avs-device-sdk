@@ -20,6 +20,7 @@
 
 #include "Alerts/Storage/AlertStorageInterface.h"
 #include "Alerts/AlertObserverInterface.h"
+#include "Alerts/UdpClientServer.h"
 
 #include <AVSCommon/AVS/FocusState.h>
 
@@ -222,6 +223,8 @@ private:
      * protection.
      */
     std::shared_ptr<AlertObserverInterface> m_observer;
+    
+    UdpClient* m_udp_client = new UdpClient("127.0.0.1", 5005);
 
     /// Mutex for accessing all variables besides the observer.
     std::mutex m_mutex;
